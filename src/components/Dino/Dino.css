@@ -50,7 +50,16 @@
   background-image: url("img/cactus.png");
   background-size: 20px 40px;
 
-  animation: block 1s infinite linear;
+  animation: block 2s infinite linear;
+}
+
+.game.paused #cactus {
+  animation-play-state: paused;
+}
+
+#pause-button {
+  display: block;
+  margin: 12px auto 0;
 }
 
 @keyframes block {

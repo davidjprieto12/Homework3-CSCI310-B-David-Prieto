@@ -6,8 +6,15 @@ function Dino() {
   const cactusRef = useRef();
   const [score, setScore] = useState(0);
 
-  const jump = () => {
-    if (!!dinoRef.current && dinoRef.current.classList != "jump") {
+  const [gamePaused, pauseGame] = useState(true);
+
+  const jump = (event) => {
+    if (event.code !== "Space" || event.target.closest("button")) {
+      return;
+    }
+
+    event.preventDefault();
+    if (!!dinoRef.current && dinoRef.current.classList !== "jump") {
       dinoRef.current.classList.add("jump");
       setTimeout(function () {
         dinoRef.current.classList.remove("jump");
@@ -16,40 +23,57 @@ function Dino() {
   };
 
   useEffect(() => {
-    const isAlive = setInterval(function () {
-      // get current dino Y position
-      const dinoTop = parseInt(
-        getComputedStyle(dinoRef.current).getPropertyValue("top")
-      );
+    if (!gamePaused) {
+      const isAlive = setInterval(function () {
+        // get current dino Y position
+        const dinoTop = parseInt(
+          getComputedStyle(dinoRef.current).getPropertyValue("top")
+        );
 
-      // get current cactus X position
-      let cactusLeft = parseInt(
-        getComputedStyle(cactusRef.current).getPropertyValue("left")
-      );
+        // get current cactus X position
+        let cactusLeft = parseInt(
+          getComputedStyle(cactusRef.current).getPropertyValue("left")
+        );
 
-      // detect collision
-      if (cactusLeft < 40 && cactusLeft > 0 && dinoTop >= 140) {
-        // collision
-        alert("Game Over! Your Score : " + score);
-        setScore(0);
-      } else {
-        setScore(score + 1);
-      }
-    }, 10);
+        // detect collision
+        if (cactusLeft < 40 && cactusLeft > 0 && dinoTop >= 140) {
+          // collision
+          alert("Game Over! Your Score : " + score);
+          setScore(0);
+          pauseGame(true);
+        } else {
+          setScore((currentScore) => currentScore + 1);
+        }
+      }, 10);
 
-    return () => clearInterval(isAlive);
+      return () => clearInterval(isAlive);
+    }
   });
 
   useEffect(() => {
     document.addEventListener("keydown", jump);
-    return () => document.removeEventListener("keydown", jump);
+    return () => {
+      document.removeEventListener("keydown", jump);
+    };
   }, []);
 
   return (
-    <div className="game">
+    <div>
+    <div className={`game ${gamePaused ? "paused" : ""}`}>
       Score : {score}
       <div id="dino" ref={dinoRef}></div>
       <div id="cactus" ref={cactusRef}></div>
+    </div>
+
+    <button
+      id="pause-button"
+      onClick={(event) => {
+        pauseGame((paused) => !paused);
+        event.currentTarget.blur();
+      }}
+    >
+        {gamePaused ? "Resume" : "Pause"}
+      </button>
     </div>
   );
 }
