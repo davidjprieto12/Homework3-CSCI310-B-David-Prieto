@@ -4,8 +4,8 @@ import "./Dino.css";
 // TODO: Add 5 features
 // 1. Highest Scores
 // 2. Skins
-// 3. Shield
-// 4. Biome / Obstacle Change
+// 3. Animations (DONE)
+// 4. Shield
 // 5. Fog
 
 function Dino() {
@@ -105,7 +105,7 @@ function Dino() {
   return (
     <div>
 
-    <div className={(gameRunning && !gameOver) ? "game" : "game not-running"}>
+    <div className={`game ${gameRunning && !gameOver ? "running" : "not-running"} ${gameOver ? "game-over" : ""}`}>
       Score : {score}
       <div id="dino" ref={dinoRef}></div>
       {cactusReady && <div id="cactus" ref={cactusRef}></div>}

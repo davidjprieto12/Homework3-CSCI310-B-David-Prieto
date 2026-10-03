@@ -12,10 +12,33 @@
 #dino {
   width: 50px;
   height: 50px;
-  background-image: url(img/trex.png);
+  background-image: url(img/dino-default.png);
   background-size: 50px 50px;
   position: relative;
+  z-index: 1;
   top: 150px;
+}
+
+.game.running #dino {
+  animation: dino-run 0.2s steps(1, end) infinite;
+}
+
+.game.running #dino.jump {
+  animation: dino-run 0.2s steps(1, end) infinite, jump 0.3s linear;
+}
+
+.game.game-over #dino {
+  background-image: url(img/dino-eyes.png);
+}
+
+@keyframes dino-run {
+  0%, 49% {
+    background-image: url(img/dino-run1.png);
+  }
+
+  50%, 100% {
+    background-image: url(img/dino-run2.png);
+  }
 }
 
 .jump {
@@ -48,6 +71,7 @@
   width: 20px;
   height: 40px;
   position: relative;
+  z-index: 0;
   top: 110px;
   left: 580px;
 
