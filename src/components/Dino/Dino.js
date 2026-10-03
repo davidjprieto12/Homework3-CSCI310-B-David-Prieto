@@ -1,29 +1,74 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./Dino.css";
+
+// TODO: Add 5 features
+// 1. Highest Scores
+// 2. Skins
+// 3. Shield
+// 4. Biome / Obstacle Change
+// 5. Fog
 
 function Dino() {
   const dinoRef = useRef();
   const cactusRef = useRef();
+
   const [score, setScore] = useState(0);
+  const [gameRunning, setGameRunning] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [cactusReady, setCactusReady] = useState(false);
+  const [message, setMessage] = useState("Press Space to Start!");
 
-  const [gamePaused, pauseGame] = useState(true);
+  const StartMessage = ({ displayedMessage }) => {
+    return(
+      <div className="start-message">
+        <p>{displayedMessage}</p>
+      </div>
+    )
+  }
 
-  const jump = (event) => {
+  const jump = useCallback((event) => {
     if (event.code !== "Space" || event.target.closest("button")) {
       return;
     }
 
     event.preventDefault();
+
+    if (gameOver) {
+      setGameRunning(false);
+      setGameOver(false);
+      setCactusReady(false);
+      setMessage("Press Space to Start!");
+      return;
+    }
+
+    if (!gameRunning) {
+      setGameRunning(true);
+      setCactusReady(false);
+      return;
+    }
+
     if (!!dinoRef.current && dinoRef.current.classList !== "jump") {
       dinoRef.current.classList.add("jump");
       setTimeout(function () {
         dinoRef.current.classList.remove("jump");
       }, 300);
     }
-  };
+  }, [gameRunning, gameOver]);
 
   useEffect(() => {
-    if (!gamePaused) {
+    if (gameRunning && !gameOver) {
+      const cactusTimer = setTimeout(() => {
+        setCactusReady(true);
+      }, 1000);
+
+      setMessage("Go!");
+
+      return () => clearTimeout(cactusTimer);
+    }
+  }, [gameRunning, gameOver]);
+
+  useEffect(() => {
+    if (gameRunning && !gameOver && cactusReady) {
       const isAlive = setInterval(function () {
         // get current dino Y position
         const dinoTop = parseInt(
@@ -38,9 +83,9 @@ function Dino() {
         // detect collision
         if (cactusLeft < 40 && cactusLeft > 0 && dinoTop >= 140) {
           // collision
-          alert("Game Over! Your Score : " + score);
+          setMessage("Game Over! Press Space to Reset. Your Score: " + score);
           setScore(0);
-          pauseGame(true);
+          setGameOver(true);
         } else {
           setScore((currentScore) => currentScore + 1);
         }
@@ -48,32 +93,25 @@ function Dino() {
 
       return () => clearInterval(isAlive);
     }
-  });
+  }, [gameRunning, gameOver, cactusReady, score]);
 
   useEffect(() => {
     document.addEventListener("keydown", jump);
     return () => {
       document.removeEventListener("keydown", jump);
     };
-  }, []);
+  }, [jump]);
 
   return (
     <div>
-    <div className={`game ${gamePaused ? "paused" : ""}`}>
+
+    <div className={(gameRunning && !gameOver) ? "game" : "game not-running"}>
       Score : {score}
       <div id="dino" ref={dinoRef}></div>
-      <div id="cactus" ref={cactusRef}></div>
+      {cactusReady && <div id="cactus" ref={cactusRef}></div>}
     </div>
 
-    <button
-      id="pause-button"
-      onClick={(event) => {
-        pauseGame((paused) => !paused);
-        event.currentTarget.blur();
-      }}
-    >
-        {gamePaused ? "Resume" : "Pause"}
-      </button>
+    {(!gameRunning || gameOver || cactusReady) && <StartMessage displayedMessage={message}/>}
     </div>
   );
 }
