@@ -13,15 +13,33 @@ function Dino() {
   const cactusRef = useRef();
 
   const [score, setScore] = useState(0);
+  const [topScores, setTopScores] = useState([0, 0, 0])
+
   const [gameRunning, setGameRunning] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [cactusReady, setCactusReady] = useState(false);
+
   const [message, setMessage] = useState("Press Space to Start!");
 
   const StartMessage = ({ displayedMessage }) => {
     return(
       <div className="start-message">
         <p>{displayedMessage}</p>
+      </div>
+    )
+  }
+
+  const Scoreboard = ({topScores}) => {
+    let firstScore = topScores[0];
+    let secondScore = topScores[1];
+    let thirdScore = topScores[2];
+
+    return(
+      <div className="scoreboard">
+        <h1>Today's Top Scores:</h1>
+        {(firstScore !== 0) && <p>1st: {firstScore} pts</p>}
+        {(secondScore !== 0) && <p>2nd: {secondScore} pts</p>}
+        {(thirdScore !== 0) && <p>3rd: {thirdScore} pts</p>}
       </div>
     )
   }
@@ -84,6 +102,12 @@ function Dino() {
         if (cactusLeft < 40 && cactusLeft > 0 && dinoTop >= 140) {
           // collision
           setMessage("Game Over! Press Space to Reset. Your Score: " + score);
+
+          // scoreboard updates
+          setTopScores((currentScores) =>
+            [...currentScores, score].sort((a, b) => b - a).slice(0, 3)
+          );
+
           setScore(0);
           setGameOver(true);
         } else {
@@ -93,7 +117,7 @@ function Dino() {
 
       return () => clearInterval(isAlive);
     }
-  }, [gameRunning, gameOver, cactusReady, score]);
+  }, [gameRunning, gameOver, cactusReady, score, topScores]);
 
   useEffect(() => {
     document.addEventListener("keydown", jump);
@@ -112,6 +136,8 @@ function Dino() {
     </div>
 
     {(!gameRunning || gameOver || cactusReady) && <StartMessage displayedMessage={message}/>}
+
+    <Scoreboard topScores={topScores}/>
     </div>
   );
 }
