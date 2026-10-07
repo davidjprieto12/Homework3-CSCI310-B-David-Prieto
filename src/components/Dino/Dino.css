@@ -68,11 +68,35 @@ h1 {
 #dino {
   width: 50px;
   height: 50px;
-  background-image: url(img/dino-default.png);
+  background-image: var(--dino-idle);
   background-size: 50px 50px;
   position: relative;
   z-index: 1;
   top: 150px;
+}
+
+.skin-default {
+  --dino-idle: url(img/default-sprites/dino-default.png);
+  --dino-jump: url(img/default-sprites/dino-default.png);
+  --dino-run1: url(img/default-sprites/dino-run1.png);
+  --dino-run2: url(img/default-sprites/dino-run2.png);
+  --dino-game-over: url(img/default-sprites/dino-eyes.png);
+}
+
+.skin-jockey {
+  --dino-idle: url(img/jockey-sprites/jockey-def-run1.png);
+  --dino-jump: url(img/jockey-sprites/jockey-jump.png);
+  --dino-run1: url(img/jockey-sprites/jockey-def-run1.png);
+  --dino-run2: url(img/jockey-sprites/jockey-run2.png);
+  --dino-game-over: url(img/jockey-sprites/jockey-eyes.png);
+}
+
+.skin-surfer {
+  --dino-idle: url(img/surfer-sprites/surfer-def-run1.png);
+  --dino-jump: url(img/surfer-sprites/surfer-jump.png);
+  --dino-run1: url(img/surfer-sprites/surfer-def-run1.png);
+  --dino-run2: url(img/surfer-sprites/surfer-run2.png);
+  --dino-game-over: url(img/surfer-sprites/surfer-eyes.png);
 }
 
 .game.running #dino {
@@ -81,19 +105,20 @@ h1 {
 
 .game.running #dino.jump {
   animation: dino-run 0.2s steps(1, end) infinite, jump 0.4s linear;
+  background-image: var(--dino-jump);
 }
 
 .game.game-over #dino {
-  background-image: url(img/dino-eyes.png);
+  background-image: var(--dino-game-over);
 }
 
 @keyframes dino-run {
   0%, 49% {
-    background-image: url(img/dino-run1.png);
+    background-image: var(--dino-run1);
   }
 
   50%, 100% {
-    background-image: url(img/dino-run2.png);
+    background-image: var(--dino-run2);
   }
 }
 

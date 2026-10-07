@@ -1,23 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./Dino.css";
 
-const createCactus = () => {
-  const height = 40 + Math.floor(Math.random() * 7);
-
-  return {
-    width: Math.round(height / 2),
-    height,
-    startX: 550 + Math.floor(Math.random() * 51),
-    duration: 1.1 + Math.random() * 0.4,
-  };
-};
-
 // TODO: Add 5 features
 // 1. Highest Scores (DONE)
 // 2. Skins (ONGOING)
 // 3. Animations (DONE)
 // 4. Shield
-// 5. QOL - Game states, runup, randomization
+// 5. QOL - Game states, runup, randomization (DONE)
 
 function Dino() {
   const dinoRef = useRef();
@@ -33,6 +22,15 @@ function Dino() {
   const [cactus, setCactus] = useState(null);
 
   const [message, setMessage] = useState("Press Space to Start!");
+
+  const [skin, setSkin] = useState("default")
+
+  const selectSkin = (event, selectedSkin) => {
+    setSkin(selectedSkin);
+    if (event.detail > 0) {
+      event.currentTarget.blur();
+    }
+  };
 
   const StartMessage = ({ displayedMessage }) => {
     return(
@@ -87,11 +85,23 @@ function Dino() {
     }
   }, [gameRunning, gameOver]);
 
+  const createCactus = () => {
+    const height = 30 + Math.floor(Math.random() * 20);
+    const difficulty = Math.min(scoreRef.current / 5000, 1);
+
+    return {
+      width: Math.round(height / 2),
+      height,
+      startX: 550 + Math.floor(Math.random() * 51),
+      duration: (1.2 - difficulty) + Math.random() * 0.4,
+    };
+  };
+
   useEffect(() => {
     if (gameRunning && !gameOver && !cactusReady) {
       const difficulty = Math.min(scoreRef.current / 5000, 1);
-      const baseDelay = 700 - difficulty * (700 - 200);
-      const spawnDelay = baseDelay * (0.8 + Math.random() * 0.4);
+      const baseDelay = 600 - difficulty * (700 - 200);
+      let spawnDelay = baseDelay * (0.8 + Math.random() * 0.4);
 
       const cactusTimer = setTimeout(() => {
         setCactus(createCactus());
@@ -161,7 +171,7 @@ function Dino() {
 
         <div className={`game ${gameRunning && !gameOver ? "running" : "not-running"} ${gameOver ? "game-over" : ""}`}>
           Score : {score}
-          <div id="dino" ref={dinoRef}></div>
+          <div id="dino" className={`skin-${skin}`} ref={dinoRef}></div>
           {cactusReady && cactus && (
             <div
               id="cactus"
@@ -183,9 +193,9 @@ function Dino() {
       </div>
 
       <div className="sprite-selector" aria-label="Choose a dinosaur sprite set">
-        <button type="button">Sprite Set 1</button>
-        <button type="button">Sprite Set 2</button>
-        <button type="button">Sprite Set 3</button>
+        <button type="button" onClick={(event) => selectSkin(event, "default")}>Default Dino</button>
+        <button type="button" onClick={(event) => selectSkin(event, "jockey")}>Jockey Dino</button>
+        <button type="button" onClick={(event) => selectSkin(event, "surfer")}>Surf Dino</button>
       </div>
 
       <Scoreboard topScores={topScores}/>
