@@ -1,16 +1,28 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./Dino.css";
 
+const createCactus = () => {
+  const height = 40 + Math.floor(Math.random() * 7);
+
+  return {
+    width: Math.round(height / 2),
+    height,
+    startX: 550 + Math.floor(Math.random() * 51),
+    duration: 1.1 + Math.random() * 0.4,
+  };
+};
+
 // TODO: Add 5 features
-// 1. Highest Scores
-// 2. Skins
+// 1. Highest Scores (DONE)
+// 2. Skins (ONGOING)
 // 3. Animations (DONE)
 // 4. Shield
-// 5. Fog
+// 5. QOL - Game states, runup, randomization
 
 function Dino() {
   const dinoRef = useRef();
   const cactusRef = useRef();
+  const scoreRef = useRef(0);
 
   const [score, setScore] = useState(0);
   const [topScores, setTopScores] = useState([0, 0, 0])
@@ -18,6 +30,7 @@ function Dino() {
   const [gameRunning, setGameRunning] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [cactusReady, setCactusReady] = useState(false);
+  const [cactus, setCactus] = useState(null);
 
   const [message, setMessage] = useState("Press Space to Start!");
 
@@ -36,10 +49,10 @@ function Dino() {
 
     return(
       <div className="scoreboard">
-        <h1>Today's Top Scores:</h1>
-        {(firstScore !== 0) && <p>1st: {firstScore} pts</p>}
-        {(secondScore !== 0) && <p>2nd: {secondScore} pts</p>}
-        {(thirdScore !== 0) && <p>3rd: {thirdScore} pts</p>}
+          <h1>Today's Top Scores:</h1>
+          <p className="score">1st: {firstScore} pts</p>
+          <p className="score">2nd: {secondScore} pts</p>
+          <p className="score">3rd: {thirdScore} pts</p>
       </div>
     )
   }
@@ -62,62 +75,75 @@ function Dino() {
     if (!gameRunning) {
       setGameRunning(true);
       setCactusReady(false);
+      setMessage("Go!");
       return;
     }
 
-    if (!!dinoRef.current && dinoRef.current.classList !== "jump") {
+    if (dinoRef.current && !dinoRef.current.classList.contains("jump")) {
       dinoRef.current.classList.add("jump");
       setTimeout(function () {
-        dinoRef.current.classList.remove("jump");
-      }, 300);
+        dinoRef.current?.classList.remove("jump");
+      }, 400);
     }
   }, [gameRunning, gameOver]);
 
   useEffect(() => {
-    if (gameRunning && !gameOver) {
-      const cactusTimer = setTimeout(() => {
-        setCactusReady(true);
-      }, 1000);
+    if (gameRunning && !gameOver && !cactusReady) {
+      const difficulty = Math.min(scoreRef.current / 5000, 1);
+      const baseDelay = 700 - difficulty * (700 - 200);
+      const spawnDelay = baseDelay * (0.8 + Math.random() * 0.4);
 
-      setMessage("Go!");
+      const cactusTimer = setTimeout(() => {
+        setCactus(createCactus());
+        setCactusReady(true);
+      }, spawnDelay);
 
       return () => clearTimeout(cactusTimer);
     }
+  }, [gameRunning, gameOver, cactusReady]);
+
+  useEffect(() => {
+    if (gameRunning && !gameOver) {
+      const scoreTimer = setInterval(() => {
+        scoreRef.current += 1;
+        setScore(scoreRef.current);
+      }, 10);
+
+      return () => clearInterval(scoreTimer);
+    }
   }, [gameRunning, gameOver]);
 
   useEffect(() => {
-    if (gameRunning && !gameOver && cactusReady) {
-      const isAlive = setInterval(function () {
-        // get current dino Y position
-        const dinoTop = parseInt(
-          getComputedStyle(dinoRef.current).getPropertyValue("top")
-        );
+    if (gameRunning && !gameOver && cactusReady && cactus) {
+      const collisionTimer = setInterval(function () {
+        const dinoBounds = dinoRef.current?.getBoundingClientRect();
+        const cactusBounds = cactusRef.current?.getBoundingClientRect();
 
-        // get current cactus X position
-        let cactusLeft = parseInt(
-          getComputedStyle(cactusRef.current).getPropertyValue("left")
-        );
+        if (
+          dinoBounds &&
+          cactusBounds &&
+          dinoBounds.right > cactusBounds.left &&
+          dinoBounds.left < cactusBounds.right &&
+          dinoBounds.bottom > cactusBounds.top &&
+          dinoBounds.top < cactusBounds.bottom
+        ) {
+          const finalScore = scoreRef.current;
+          setMessage("Game Over! Press Space to Reset. Your Score: " + finalScore);
 
-        // detect collision
-        if (cactusLeft < 40 && cactusLeft > 0 && dinoTop >= 140) {
-          // collision
-          setMessage("Game Over! Press Space to Reset. Your Score: " + score);
-
-          // scoreboard updates
           setTopScores((currentScores) =>
-            [...currentScores, score].sort((a, b) => b - a).slice(0, 3)
+            [...currentScores, finalScore].sort((a, b) => b - a).slice(0, 3)
           );
 
+          scoreRef.current = 0;
           setScore(0);
           setGameOver(true);
-        } else {
-          setScore((currentScore) => currentScore + 1);
+          clearInterval(collisionTimer);
         }
       }, 10);
 
-      return () => clearInterval(isAlive);
+      return () => clearInterval(collisionTimer);
     }
-  }, [gameRunning, gameOver, cactusReady, score, topScores]);
+  }, [gameRunning, gameOver, cactusReady, cactus]);
 
   useEffect(() => {
     document.addEventListener("keydown", jump);
@@ -127,17 +153,42 @@ function Dino() {
   }, [jump]);
 
   return (
-    <div>
+    <div className="dino-layout">
+      <div className="game-content">
+        <div className="game-title">
+          <h1>Dino Game</h1>
+        </div>
 
-    <div className={`game ${gameRunning && !gameOver ? "running" : "not-running"} ${gameOver ? "game-over" : ""}`}>
-      Score : {score}
-      <div id="dino" ref={dinoRef}></div>
-      {cactusReady && <div id="cactus" ref={cactusRef}></div>}
-    </div>
+        <div className={`game ${gameRunning && !gameOver ? "running" : "not-running"} ${gameOver ? "game-over" : ""}`}>
+          Score : {score}
+          <div id="dino" ref={dinoRef}></div>
+          {cactusReady && cactus && (
+            <div
+              id="cactus"
+              ref={cactusRef}
+              onAnimationEnd={() => setCactusReady(false)}
+              style={{
+                "--cactus-width": `${cactus.width}px`,
+                "--cactus-height": `${cactus.height}px`,
+                "--cactus-start": `${cactus.startX}px`,
+                "--cactus-end": `-${cactus.width}px`,
+                "--cactus-duration": `${cactus.duration}s`,
+                backgroundSize: `${cactus.width}px ${cactus.height}px`,
+              }}
+            />
+          )}
+        </div>
 
-    {(!gameRunning || gameOver || cactusReady) && <StartMessage displayedMessage={message}/>}
+        {(!gameRunning || gameOver || message === "Go!") && <div className="game-message"><StartMessage displayedMessage={message}/></div>}
+      </div>
 
-    <Scoreboard topScores={topScores}/>
+      <div className="sprite-selector" aria-label="Choose a dinosaur sprite set">
+        <button type="button">Sprite Set 1</button>
+        <button type="button">Sprite Set 2</button>
+        <button type="button">Sprite Set 3</button>
+      </div>
+
+      <Scoreboard topScores={topScores}/>
     </div>
   );
 }

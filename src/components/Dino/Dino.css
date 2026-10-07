@@ -1,13 +1,69 @@
+h1 {
+  font-size: 20px;
+}
+
+.dino-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 604px minmax(0, 1fr);
+}
+
+.game-content {
+  display: contents;
+}
+
+.game-title {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.game {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.game-message {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.sprite-selector {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-right: 16px;
+}
+
+.scoreboard {
+  grid-column: 3;
+  grid-row: 2;
+  align-self: center;
+  justify-self: start;
+  margin-left: 16px;
+}
+
 .game {
   width: 600px;
   height: 225px;
-  border: 1px solid black;
+  border: 2px solid black;
   margin: auto;
 }
 
 #start-message {
   position: relative;
 }
+
+.scoreboard {
+  width: 200px;
+}
+
+#score {
+  font-size: 10px;
+}
+
 
 #dino {
   width: 50px;
@@ -24,7 +80,7 @@
 }
 
 .game.running #dino.jump {
-  animation: dino-run 0.2s steps(1, end) infinite, jump 0.3s linear;
+  animation: dino-run 0.2s steps(1, end) infinite, jump 0.4s linear;
 }
 
 .game.game-over #dino {
@@ -42,7 +98,7 @@
 }
 
 .jump {
-  animation: jump 0.3s linear;
+  animation: jump 0.4s linear;
 }
 
 @keyframes jump {
@@ -50,16 +106,16 @@
     top: 150px;
   }
 
-  30% {
-    top: 130px;
+  20% {
+    top: 100px;
   }
 
   50% {
-    top: 80px;
+    top: 70px;
   }
 
   80% {
-    top: 130px;
+    top: 100px;
   }
 
   100% {
@@ -68,17 +124,17 @@
 }
 
 #cactus {
-  width: 20px;
-  height: 40px;
+  width: var(--cactus-width);
+  height: var(--cactus-height);
   position: relative;
   z-index: 0;
-  top: 110px;
-  left: 580px;
+  top: calc(150px - var(--cactus-height));
+  left: var(--cactus-start);
 
   background-image: url("img/cactus.png");
-  background-size: 20px 40px;
+  background-repeat: no-repeat;
 
-  animation: block 1s infinite linear;
+  animation: block var(--cactus-duration) linear forwards;
 }
 
 .game.not-running #cactus {
@@ -92,10 +148,10 @@
 
 @keyframes block {
   0% {
-    left: 580px;
+    left: var(--cactus-start);
   }
 
   100% {
-    left: -5px;
+    left: var(--cactus-end);
   }
 }
