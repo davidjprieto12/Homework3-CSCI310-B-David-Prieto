@@ -1,5 +1,21 @@
+.pixelify-sans-font {
+  font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 550;
+  font-style: normal;
+}
+
+html, body {
+  font-family:'Pixelify Sans', sans-serif;
+}
+
 h1 {
+  font-size: 24px;
+}
+
+.subheader {
   font-size: 20px;
+  font-weight: bold;
 }
 
 .dino-layout {
@@ -34,7 +50,58 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-right: 16px;
+  margin-right: 150px;
+}
+
+.sprites-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skin-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.skin-option img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  display: block;
+}
+
+.skin-button {
+  padding: 10px 18px;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  border-radius: 999px;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.skin-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.default-button {
+  background: #dff5ff;
+  color: #0d2b45;
+}
+
+.jockey-button {
+  background: #dffae5;
+  color: #133d2f;
+}
+
+.surfer-button {
+  background: #ffe2e2;
+  color: #5e1a1a;
 }
 
 .scoreboard {
@@ -42,7 +109,7 @@ h1 {
   grid-row: 2;
   align-self: center;
   justify-self: start;
-  margin-left: 16px;
+  margin-left: 150px;
 }
 
 .game {
@@ -60,8 +127,8 @@ h1 {
   width: 200px;
 }
 
-#score {
-  font-size: 10px;
+.score {
+  font-size: 20px;
 }
 
 

@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./Dino.css";
+import defaultSprite from "./img/default-sprites/dino-default.png";
+import jockeySprite from "./img/jockey-sprites/jockey-def-run1.png"
+import surferSprite from "./img/surfer-sprites/surfer-def-run1.png"
 
 // TODO: Add 5 features
 // 1. Highest Scores (DONE)
-// 2. Skins (ONGOING)
+// 2. Skins (DONE)
 // 3. Animations (DONE)
 // 4. Shield
 // 5. QOL - Game states, runup, randomization (DONE)
@@ -14,7 +17,7 @@ function Dino() {
   const scoreRef = useRef(0);
 
   const [score, setScore] = useState(0);
-  const [topScores, setTopScores] = useState([0, 0, 0])
+  const [topScores, setTopScores] = useState([0, 0, 0, 0, 0])
 
   const [gameRunning, setGameRunning] = useState(false);
   const [gameOver, setGameOver] = useState(false);
@@ -35,7 +38,7 @@ function Dino() {
   const StartMessage = ({ displayedMessage }) => {
     return(
       <div className="start-message">
-        <p>{displayedMessage}</p>
+        <p style={{"font-size": `18px`}}>{displayedMessage}</p>
       </div>
     )
   }
@@ -44,13 +47,17 @@ function Dino() {
     let firstScore = topScores[0];
     let secondScore = topScores[1];
     let thirdScore = topScores[2];
+    let fourthScore = topScores[3];
+    let fifthScore = topScores[4];
 
     return(
       <div className="scoreboard">
-          <h1>Today's Top Scores:</h1>
-          <p className="score">1st: {firstScore} pts</p>
-          <p className="score">2nd: {secondScore} pts</p>
-          <p className="score">3rd: {thirdScore} pts</p>
+          <p className="subheader">Today's Top Scores:</p>
+          <p className="score" style={{"color": `#D4AF37`}}>1st: {firstScore} pts</p>
+          <p className="score" style={{"color": `#909090`}}>2nd: {secondScore} pts</p>
+          <p className="score" style={{"color": `#CD7F32`}}>3rd: {thirdScore} pts</p>
+          <p className="score">4th: {fourthScore} pts</p>
+          <p className="score">5th: {fifthScore} pts</p>
       </div>
     )
   }
@@ -141,7 +148,7 @@ function Dino() {
           setMessage("Game Over! Press Space to Reset. Your Score: " + finalScore);
 
           setTopScores((currentScores) =>
-            [...currentScores, finalScore].sort((a, b) => b - a).slice(0, 3)
+            [...currentScores, finalScore].sort((a, b) => b - a).slice(0, 5)
           );
 
           scoreRef.current = 0;
@@ -192,12 +199,25 @@ function Dino() {
         {(!gameRunning || gameOver || message === "Go!") && <div className="game-message"><StartMessage displayedMessage={message}/></div>}
       </div>
 
-      <div className="sprite-selector" aria-label="Choose a dinosaur sprite set">
-        <button type="button" onClick={(event) => selectSkin(event, "default")}>Default Dino</button>
-        <button type="button" onClick={(event) => selectSkin(event, "jockey")}>Jockey Dino</button>
-        <button type="button" onClick={(event) => selectSkin(event, "surfer")}>Surf Dino</button>
-      </div>
+      <div className="sprite-selector">
+        <p className="subheader">Skins:</p>
+        <div className="sprites-container">
+          <div className="skin-option">
+            <img src={defaultSprite} alt="Default Sprite" width="75" height="75" />
+            <button type="button" className="skin-button default-button" onClick={(event) => selectSkin(event, "default")}>Default Dino</button>
+          </div>
 
+          <div className="skin-option">
+            <img src={jockeySprite} alt="Jockey Sprite" width="75" height="75" />
+            <button type="button" className="skin-button jockey-button" onClick={(event) => selectSkin(event, "jockey")}>Jockey Dino</button>
+          </div>
+
+          <div className="skin-option">
+            <img src={surferSprite} alt="Surfer Sprite" width="75" height="75" />
+            <button type="button" className="skin-button surfer-button" onClick={(event) => selectSkin(event, "surfer")}>Surf Dino</button>
+          </div>
+        </div>
+      </div>
       <Scoreboard topScores={topScores}/>
     </div>
   );
