@@ -1,3 +1,19 @@
+# Dino Game
+
+## Task: Add 5-6 features to the original Dino Game starter code
+
+## Features Added:
+-**Scoreboard / High Scores:** The user's top 5 scores within a session are stored in a scoreboard next to the game
+-**Skins:** The user can switch between 3 different skins for the dino to play as (default, jockey, surfer)
+-**Animations:** Each skin has a sprite set that allows for standing, running, and game over animations / effects
+-**Difficulty / Randomization:** Obstacle speed, size, and variation is random, but also increases with difficulty
+-**Game State / Quality of Life:** Game now has a start and game over screen, a runup obstacle delay, and various state messages.
+-**Bonus — Stylization:** The site now has an updated icon and title, uses an imported pixel font, and has been made less monochromatic
+
+---
+
+# Note: This part of README was included in the starter code.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
